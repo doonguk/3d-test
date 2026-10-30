@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>몽글몽글 마을</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <div id="login" class="overlay">
+    <form id="login-form" class="card">
+      <h1>🌸 몽글몽글 마을</h1>
+      <p class="sub">귀여운 친구를 골라 마을에 놀러 가요</p>
+      <input id="name" maxlength="12" placeholder="닉네임 (최대 12자)" autocomplete="off" required />
+      <div class="picker" id="animals">
+        <button type="button" data-animal="cat" class="selected">🐱<span>고양이</span></button>
+        <button type="button" data-animal="bear">🐻<span>곰</span></button>
+        <button type="button" data-animal="bunny">🐰<span>토끼</span></button>
+      </div>
+      <div class="swatches" id="colors"></div>
+      <button type="submit" class="primary">입장하기</button>
+      <p id="login-error" class="error"></p>
+    </form>
+  </div>
+
+  <div id="hud" hidden>
+    <div id="chat">
+      <div id="chat-log"></div>
+      <input id="chat-input" maxlength="200" placeholder="Enter 눌러 채팅하기" autocomplete="off" />
+    </div>
+
+    <div id="side">
+      <section class="panel">
+        <header>🎒 내 가방 <span id="coins" class="coins">🪙 0</span></header>
+        <div id="items" class="grid"></div>
+      </section>
+      <section class="panel">
+        <header>👥 접속자 <span id="online-count" class="muted"></span></header>
+        <ul id="online-list"></ul>
+      </section>
+    </div>
+
+    <div id="help">WASD·방향키 이동 · Space 점프 · 드래그 시점 · 휠 줌 · 친구 클릭 → 거래</div>
+    <div id="toasts"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

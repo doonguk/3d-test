@@ -63,6 +63,10 @@ io.on('connection', (socket) => {
     socket.broadcast.volatile.emit('player:move', { sid: p.sid, x, z, ry: p.ry, moving: !!d.moving });
   });
 
+  socket.on('jump', () => {
+    if (players.has(socket.id)) socket.broadcast.emit('player:jump', { sid: socket.id });
+  });
+
   socket.on('chat', (raw) => {
     const p = players.get(socket.id);
     const text = String(raw ?? '').trim().slice(0, 200);
