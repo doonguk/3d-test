@@ -6,7 +6,8 @@
   "description": "귀여운 동물 캐릭터들이 돌아다니며 채팅하고 거래하는 웹 3D 마을",
   "scripts": {
     "start": "node server/index.js",
-    "dev": "node --watch server/index.js"
+    "dev": "node --watch server/index.js",
+    "test": "node scripts/smoke-test.mjs"
   },
   "engines": {
     "node": ">=22.13"
