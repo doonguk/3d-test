@@ -85,6 +85,39 @@ try {
   const inv = await got;
   check(gift.kind === 'coin' ? inv.coins === ia.coins + 15 : inv.items.length === ia.items.length + 1, `선물 줍기 (${gift.kind})`);
 
+  // ---------- 마당 꾸미기 ----------
+  const call = (s, ev, data) => new Promise((resolve) => s.emit(ev, data, resolve));
+  check(ra.me.plot != null && rb.me.plot != null && ra.me.plot !== rb.me.plot, `서로 다른 마당 배정 (${ra.me.plot}, ${rb.me.plot})`);
+  check(Object.keys(ra.catalog).length >= 10, `상점 상품 ${Object.keys(ra.catalog).length}종`);
+
+  const coinsBefore = inv.coins;
+  const mine = wait(a, 'decor:mine', (list) => list.length === 1);
+  check((await call(a, 'shop:buy', { kind: 'bench' })).ok, '벤치 구매');
+  const [bench] = await mine;
+  const charged = wait(a, 'inventory');
+  a.emit('demo:coins');
+  const afterBuy = await charged;
+  check(afterBuy.coins === coinsBefore - ra.catalog.bench.price + 100, '구매 금액만큼 코인 차감');
+  check((await call(a, 'shop:buy', { kind: 'nope' })).ok === false, '없는 상품 거부');
+
+  check((await call(a, 'decor:place', { id: bench.id, x: 9, z: 0, rot: 0 })).ok === false, '마당 밖 배치 거부');
+  check((await call(b, 'decor:place', { id: bench.id, x: 0, z: 0, rot: 0 })).ok === false, '남의 아이템 배치 거부');
+  const seen = wait(b, 'decor:placed', (d) => d.id === bench.id);
+  check((await call(a, 'decor:place', { id: bench.id, x: 1, z: -2, rot: 0.5 })).ok, '마당 안 배치');
+  const d = await seen;
+  check(d.plot === ra.me.plot && d.x === 1 && d.rot === 0.5, '다른 유저에게 배치 전달');
+
+  const late = io(url);
+  const rc = await join_(late, '나중에');
+  check(rc.decor.some((x) => x.id === bench.id), '나중에 들어온 유저도 꾸민 마당을 봄');
+  check(rc.yards.some((y) => y.plot === ra.me.plot && y.name === '앨리스'), '마당 주인 정보 전달');
+  late.close();
+
+  const removed = wait(b, 'decor:removed', (x) => x.id === bench.id);
+  check((await call(a, 'decor:store', { id: bench.id })).ok, '보관함으로 회수');
+  await removed;
+  check(true, '회수가 다른 유저에게 전달');
+
   console.log('\n모든 스모크 테스트 통과 🎉');
 } finally {
   a.close();
