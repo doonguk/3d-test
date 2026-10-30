@@ -43,6 +43,15 @@
 
     <div id="side">
       <section class="panel">
+        <header>🏡 내 마당 <span id="yard-count" class="muted small"></span></header>
+        <div class="yard-actions">
+          <button id="go-yard" class="primary small">이동</button>
+          <button id="open-shop" class="ghost small">🛍️ 상점</button>
+          <button id="edit-yard" class="ghost small">🛠️ 꾸미기</button>
+          <button id="add-coins" class="ghost small" title="데모: 코인 +100">🪙 +100</button>
+        </div>
+      </section>
+      <section class="panel">
         <header>🎒 내 가방 <span id="coins" class="coins">🪙 0</span></header>
         <div id="items" class="grid"></div>
       </section>
@@ -61,6 +70,30 @@
     </div>
 
     <div id="requests"></div>
+
+    <div id="edit-tray" class="panel" hidden>
+      <div class="edit-head">
+        <strong>🛠️ 마당 꾸미기</strong>
+        <span id="edit-count" class="muted small"></span>
+        <span class="spacer"></span>
+        <button id="edit-rotate" class="ghost small">↻ 회전</button>
+        <button id="edit-shop" class="ghost small">🛍️ 상점</button>
+        <button id="edit-done" class="primary small">완료</button>
+      </div>
+      <div id="edit-items" class="edit-items"></div>
+      <p id="edit-hint" class="muted small"></p>
+    </div>
+
+    <div id="shop" class="overlay soft" hidden>
+      <div class="card shop-card">
+        <h2>🛍️ 꾸미기 상점 <span id="shop-coins" class="coins"></span></h2>
+        <div id="shop-list" class="shop-grid"></div>
+        <div class="trade-actions">
+          <button id="shop-close" class="ghost">닫기</button>
+          <button id="shop-to-edit" class="primary">🛠️ 꾸미러 가기</button>
+        </div>
+      </div>
+    </div>
 
     <div id="trade" class="overlay soft" hidden>
       <div class="card trade-card">
@@ -91,5 +124,6 @@
   <script type="module" src="js/main.js"></script>
   <script type="module" src="js/trade.js"></script>
   <script type="module" src="js/gifts.js"></script>
+  <script type="module" src="js/shop.js"></script>
 </body>
 </html>

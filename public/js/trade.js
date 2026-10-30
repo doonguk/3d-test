@@ -21,6 +21,7 @@ function requestTrade(sid) {
 }
 
 document.addEventListener('world-click', ({ detail: { x, y } }) => {
+  if (state.mode !== 'play') return;
   const sid = getMe() && pickPlayerAt(x, y);
   if (!sid) return void (menu.hidden = true);
   menuTarget = sid;

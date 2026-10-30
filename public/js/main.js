@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { createWorld, WORLD_RADIUS } from './world.js';
 import { createCharacter } from './character.js';
+import { createYards } from './yards.js';
 
 const $ = (sel) => document.querySelector(sel);
 const socket = io();
@@ -34,7 +35,14 @@ resize();
 const SPEED = 5.5;
 let me = null; // { sid, name, char, x, z, ry }
 const others = new Map(); // sid -> { name, color, char, x, z, ry, tx, tz, tr, moving }
-export const state = { inventory: { coins: 0, items: [] } };
+export const state = {
+  inventory: { coins: 0, items: [] },
+  catalog: {}, // 접속 시 서버에서 채운다
+  myDecor: [],
+  mode: 'play', // 'play' | 'edit'
+  focus: null, // 꾸미기 중 카메라가 바라볼 지점 { x, z }
+};
+export const yards = createYards(scene, state.catalog);
 
 function spawn(p, isMe = false) {
   const char = createCharacter({ ...p, isMe });
@@ -104,6 +112,11 @@ export function setInventory(inv) {
   document.dispatchEvent(new CustomEvent('inventory', { detail: inv }));
 }
 
+function setMyDecor(list) {
+  state.myDecor = list;
+  document.dispatchEvent(new CustomEvent('decor-mine', { detail: list }));
+}
+
 function renderOnline() {
   if (!me) return;
   const all = [me, ...others.values()];
@@ -167,6 +180,10 @@ function enterWorld(res) {
   me = spawn(res.me, true);
   res.players.forEach(addOther);
   setInventory(res.inventory);
+  Object.assign(state.catalog, res.catalog);
+  res.yards.forEach((y) => yards.setOwner(y.plot, y));
+  res.decor.forEach((d) => yards.addDecor(d));
+  setMyDecor(res.myDecor);
   renderOnline();
   document.dispatchEvent(new CustomEvent('entered', { detail: res }));
   toast(res.isNew ? '환영해요! 선물로 코인과 아이템을 받았어요 🎁' : `다시 왔네요, ${res.me.name}!`);
@@ -186,6 +203,10 @@ socket.on('chat', (msg) => {
   if (!msg.system) findPlayer(msg.sid)?.char.say(msg.text);
 });
 socket.on('inventory', setInventory);
+socket.on('yard:update', (y) => yards.setOwner(y.plot, y));
+socket.on('decor:placed', (d) => yards.addDecor(d));
+socket.on('decor:removed', ({ id }) => yards.removeDecor(id));
+socket.on('decor:mine', setMyDecor);
 socket.on('disconnect', () => toast('서버와 연결이 끊겼어요. 새로고침 해주세요 🥲', 10000));
 
 // ---------- 입력 ----------
@@ -251,9 +272,12 @@ canvas.addEventListener('wheel', (e) => {
 
 /** 화면 좌표에 있는 다른 플레이어의 sid (없으면 null) */
 const raycaster = new THREE.Raycaster();
+export function rayAt(x, y) {
+  raycaster.setFromCamera(new THREE.Vector2((x / innerWidth) * 2 - 1, -(y / innerHeight) * 2 + 1), camera);
+  return raycaster;
+}
 export function pickPlayerAt(x, y) {
-  const ndc = new THREE.Vector2((x / innerWidth) * 2 - 1, -(y / innerHeight) * 2 + 1);
-  raycaster.setFromCamera(ndc, camera);
+  rayAt(x, y);
   const roots = [...others.values()].map((o) => o.char.root);
   const hit = raycaster.intersectObjects(roots, true)[0];
   if (!hit) return null;
@@ -264,7 +288,7 @@ export function pickPlayerAt(x, y) {
 
 // ---------- 루프 ----------
 function collide(p) {
-  for (const c of world.colliders) {
+  for (const c of [...world.colliders, ...yards.colliders]) {
     const dx = p.x - c.x;
     const dz = p.z - c.z;
     const d = Math.hypot(dx, dz);
@@ -294,11 +318,12 @@ const camTarget = new THREE.Vector3();
 function tick() {
   const dt = Math.min(clock.getDelta(), 0.05);
   world.update(dt);
+  yards.update(dt);
 
   if (me) {
     let f = 0;
     let s = 0;
-    if (!typing()) {
+    if (!typing() && state.mode === 'play') {
       if (keys.has('KeyW') || keys.has('ArrowUp')) f += 1;
       if (keys.has('KeyS') || keys.has('ArrowDown')) f -= 1;
       if (keys.has('KeyD') || keys.has('ArrowRight')) s += 1;
@@ -330,10 +355,11 @@ function tick() {
       sendTimer = 0.08;
     }
 
-    camTarget.set(me.x, 1.2, me.z);
+    const focus = state.focus ?? me;
+    camTarget.lerp(new THREE.Vector3(focus.x, 1.2, focus.z), 1 - Math.exp(-dt * 10));
     const cp = Math.cos(cam.pitch);
     camera.position.lerp(
-      new THREE.Vector3(me.x + sin * cam.dist * cp, 1.2 + Math.sin(cam.pitch) * cam.dist, me.z + cos * cam.dist * cp),
+      new THREE.Vector3(camTarget.x + sin * cam.dist * cp, 1.2 + Math.sin(cam.pitch) * cam.dist, camTarget.z + cos * cam.dist * cp),
       1 - Math.exp(-dt * 10),
     );
     camera.lookAt(camTarget);
@@ -360,4 +386,4 @@ function tick() {
 }
 tick();
 
-export { socket, scene };
+export { socket, scene, cam, canvas };
