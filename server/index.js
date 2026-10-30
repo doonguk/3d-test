@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { Server } from 'socket.io';
 import { loginUser, getInventory } from './db.js';
+import { setupTrade } from './trade.js';
 
 const PORT = Number(process.env.PORT ?? 3000);
 const WORLD_RADIUS = 37;
@@ -16,10 +17,14 @@ const io = new Server(http);
 /** socket.id -> 접속 중인 플레이어 */
 const players = new Map();
 
+const bindTrade = setupTrade(io, players);
+
 const publicPlayer = (p) => ({ sid: p.sid, name: p.name, animal: p.animal, color: p.color, x: p.x, z: p.z, ry: p.ry });
 const num = (v, fallback = 0) => (Number.isFinite(v) ? v : fallback);
 
 io.on('connection', (socket) => {
+  bindTrade(socket);
+
   socket.on('join', (data, ack) => {
     if (typeof ack !== 'function' || players.has(socket.id)) return;
     const name = String(data?.name ?? '').trim().slice(0, 12);
