@@ -1,0 +1,21 @@
+{
+  "name": "mongle-town",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "귀여운 동물 캐릭터들이 돌아다니며 채팅하고 거래하는 웹 3D 마을",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "express": "^4.22.3",
+    "socket.io": "^4.8.4"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.4"
+  }
+}
