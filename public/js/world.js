@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { PLOTS, PLOT_RADIUS } from './yards.js';
 
 export const WORLD_RADIUS = 37;
 const ISLAND_RADIUS = 40;
@@ -137,7 +138,8 @@ export function createWorld(scene) {
       const r = minR + rand() * (maxR - minR);
       const x = Math.cos(a) * r;
       const z = Math.sin(a) * r;
-      if (placed.every((p) => Math.hypot(p.x - x, p.z - z) > gap)) {
+      const inYard = PLOTS.some((p) => Math.hypot(p.x - x, p.z - z) < PLOT_RADIUS + 1.6);
+      if (!inYard && placed.every((p) => Math.hypot(p.x - x, p.z - z) > gap)) {
         placed.push({ x, z });
         return { x, z };
       }
@@ -173,7 +175,10 @@ export function createWorld(scene) {
   for (let i = 0; i < count; i++) {
     const a = rand() * Math.PI * 2;
     const r = 7.5 + rand() * (ISLAND_RADIUS - 8.5);
-    m4.makeTranslation(Math.cos(a) * r, 0.12, Math.sin(a) * r);
+    const [fx, fz] = [Math.cos(a) * r, Math.sin(a) * r];
+    // 마당 안은 비워 둔다 (꾸미기 공간) — 숨긴 꽃은 땅 밑으로
+    const inYard = PLOTS.some((p) => Math.hypot(p.x - fx, p.z - fz) < PLOT_RADIUS + 0.3);
+    m4.makeTranslation(fx, inYard ? -1 : 0.12, fz);
     flowers.setMatrixAt(i, m4);
     flowers.setColorAt(i, c.set(flowerColors[i % flowerColors.length]));
   }
