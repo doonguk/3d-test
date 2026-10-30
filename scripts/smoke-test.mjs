@@ -118,6 +118,15 @@ try {
   await removed;
   check(true, '회수가 다른 유저에게 전달');
 
+  // 악의적인 클라이언트가 이상한 값을 보내도 서버가 죽지 않아야 한다
+  for (const ev of ['trade:request', 'trade:respond', 'trade:offer', 'gift:pickup', 'shop:buy', 'decor:place', 'decor:store', 'move', 'chat']) {
+    for (const v of [null, 42, 'x', []]) a.emit(ev, v);
+  }
+  const alive = wait(b, 'chat', (m) => m.text === '살아있니?');
+  a.emit('chat', '살아있니?');
+  await alive;
+  check(true, '잘못된 요청에도 서버 유지');
+
   console.log('\n모든 스모크 테스트 통과 🎉');
 } finally {
   a.close();

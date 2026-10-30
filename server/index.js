@@ -35,7 +35,22 @@ const publicPlayer = (p) => ({
 });
 const num = (v, fallback = 0) => (Number.isFinite(v) ? v : fallback);
 
+/** 클라이언트가 이상한 값(null 등)을 보내 핸들러가 throw해도 서버 프로세스가 죽지 않게 한다. */
+function guardHandlers(socket) {
+  const on = socket.on.bind(socket);
+  socket.on = (event, handler) =>
+    on(event, (...args) => {
+      try {
+        const result = handler(...args);
+        if (result instanceof Promise) result.catch((err) => console.warn(`[${event}] 처리 실패:`, err.message));
+      } catch (err) {
+        console.warn(`[${event}] 처리 실패:`, err.message);
+      }
+    });
+}
+
 io.on('connection', (socket) => {
+  guardHandlers(socket);
   bindTrade(socket);
   gifts.bind(socket);
   yards.bind(socket);
