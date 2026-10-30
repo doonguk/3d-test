@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>몽글 미로</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="maze.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body class="maze">
+  <div id="app"></div>
+  <div id="flash"></div>
+
+  <div id="maze-hud">
+    <div class="panel stats">
+      <strong id="maze-title"></strong>
+      <span>⏱ <b id="timer">00:00.0</b></span>
+      <span>⭐ <b id="star-count">0/3</b></span>
+      <span>💀 <b id="death-count">0</b></span>
+      <span id="key-slots"></span>
+    </div>
+    <div class="maze-buttons">
+      <button id="btn-map" class="ghost small" title="M">🗺️ 지도</button>
+      <button id="btn-respawn" class="ghost small" title="R">🚩 체크포인트로</button>
+      <button id="btn-new" class="ghost small">🎲 새 미로</button>
+      <a class="ghost small" href="/">🏠 마을로</a>
+    </div>
+    <canvas id="minimap" width="220" height="220"></canvas>
+    <div id="toasts"></div>
+  </div>
+
+  <div id="intro" class="overlay soft">
+    <div class="card intro-card">
+      <h1>🧩 <span id="intro-title"></span></h1>
+      <p class="sub">빛기둥이 솟은 출구 🏆 까지 가세요. 길은 하나뿐이고, 위아래로 얽혀 있어요.</p>
+      <ul class="legend">
+        <li><b>⬆️ 턱</b> 한 칸 높은 곳은 <kbd>Space</kbd> 점프, 계단은 걸어서</li>
+        <li><b>🟡 점프 발판</b> 밟으면 두 칸 높이까지 솟아올라요</li>
+        <li><b>🟣 움직이는 발판</b> 바닥 없는 구덩이를 건너요. 떨어지면 체크포인트로</li>
+        <li><b>🔺 가시 함정</b> 가시가 올라와 있을 때 밟으면 아웃. 박자를 보세요</li>
+        <li><b>🔑 열쇠 → 🚪 문</b> 같은 색 열쇠가 있어야 열려요. 열쇠는 막다른 길 깊숙이</li>
+        <li><b>🚩 체크포인트</b> 지나가면 그 자리에서 다시 시작</li>
+        <li><b>⭐ 별 3개</b> 꼭 필요하진 않지만 기록에 남아요</li>
+      </ul>
+      <p class="muted small">WASD 이동 · Space 점프 · 드래그 시점 · 휠 줌 · M 지도 · R 체크포인트로</p>
+      <p id="intro-best" class="muted small"></p>
+      <button id="btn-start" class="primary">시작하기</button>
+    </div>
+  </div>
+
+  <div id="result" class="overlay soft" hidden>
+    <div class="card intro-card">
+      <h1 id="result-title">🏆 탈출 성공!</h1>
+      <div class="result-grid">
+        <div><span class="muted small">기록</span><b id="result-time"></b></div>
+        <div><span class="muted small">별</span><b id="result-stars"></b></div>
+        <div><span class="muted small">넘어짐</span><b id="result-deaths"></b></div>
+      </div>
+      <p id="result-best" class="muted"></p>
+      <div class="trade-actions">
+        <a class="ghost" href="/">🏠 마을로</a>
+        <button id="btn-new2" class="ghost">🎲 새 미로</button>
+        <button id="btn-retry" class="primary">👻 고스트와 재도전</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/maze/game.js"></script>
+</body>
+</html>

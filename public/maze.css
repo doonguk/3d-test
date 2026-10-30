@@ -1,0 +1,72 @@
+body.maze { background: #2d2a55; }
+
+#maze-hud { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+#maze-hud > * { pointer-events: auto; }
+
+.stats {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  max-width: calc(100vw - 32px - 240px);
+}
+.stats b { font-weight: 400; color: #d9577b; }
+#timer { font-variant-numeric: tabular-nums; }
+.key-slot {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  border-radius: 6px;
+  border: 2px dashed currentColor;
+  vertical-align: middle;
+  opacity: 0.5;
+}
+.key-slot.have { border-style: solid; background: currentColor; opacity: 1; }
+
+.maze-buttons { position: absolute; top: 68px; left: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
+.maze-buttons a, .trade-actions a { text-decoration: none; display: inline-grid; place-items: center; }
+
+#minimap {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 220px;
+  height: 220px;
+  border-radius: 18px;
+  background: rgba(20, 18, 48, 0.75);
+  box-shadow: var(--shadow);
+}
+#minimap.hidden { display: none; }
+
+#toasts { top: 120px; }
+
+#flash {
+  position: fixed;
+  inset: 0;
+  background: #ff5c7a;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  transition: opacity 0.4s;
+}
+#flash.on { opacity: 0.35; transition: none; }
+
+.intro-card { width: min(520px, 100%); text-align: left; }
+.intro-card h1 { text-align: center; font-size: 26px; }
+.intro-card .sub { text-align: center; margin: 0; }
+.legend { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+.legend b { display: inline-block; min-width: 128px; font-weight: 400; color: #d9577b; }
+kbd { padding: 0 6px; border-radius: 6px; background: #f1e6ea; font-family: inherit; }
+.result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.result-grid div { padding: 10px; border-radius: 14px; background: #fff6f9; display: flex; flex-direction: column; }
+.result-grid b { font-weight: 400; font-size: 22px; }
+#result-best { text-align: center; margin: 0; }
+
+@media (max-width: 640px) {
+  #minimap { width: 140px; height: 140px; }
+  .stats { max-width: calc(100vw - 32px - 150px); }
+}
