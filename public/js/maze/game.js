@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { createCharacter } from '../character.js';
-import { generateMaze, cellCenter, cellAt, edgeKey } from './generate.js';
+import { generateMaze, cellCenter, cellAt, edgeKey, spikeUp } from './generate.js';
 import { buildBoxes, movePlatforms, createPlayer, stepPlayer, launch, onPad, PAD_V } from './physics.js';
 import { buildMazeScene, KEY_COLORS } from './build.js';
 
@@ -262,7 +262,7 @@ function tick() {
     p.mesh.position.set((b.minX + b.maxX) / 2, (b.minY + b.maxY) / 2, (b.minZ + b.maxZ) / 2);
   }
   for (const s of world.spikes) {
-    s.up = (t + s.phase) % 2.6 < 1.0;
+    s.up = spikeUp(s.phase, t);
     const target = s.up ? 0 : -0.55;
     s.mesh.userData.blades.position.y += (target - s.mesh.userData.blades.position.y) * Math.min(1, dt * 18);
   }

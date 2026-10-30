@@ -12,6 +12,9 @@ export const LEVEL_H = 1.2; // 높이 한 단계
 export const MAX_LEVEL = 4;
 export const WALL_H = 2.4; // 이웃 중 높은 바닥 기준 벽 높이
 export const PAD_WALL_H = 4.4; // 발판이 있는 칸은 높이 뛰어 벽을 넘지 못하게 더 높인다
+export const SPIKE_PERIOD = 2.6; // 가시 한 주기(초)
+export const SPIKE_UP = 1.0; // 그중 올라와 있는 시간
+export const spikeUp = (phase, t) => (t + phase) % SPIKE_PERIOD < SPIKE_UP;
 export const DIRS = [
   [1, 0],
   [-1, 0],
@@ -199,11 +202,17 @@ export function generateMaze(seed, size = 13) {
     .filter((c) => c !== undefined);
   checkpoints.forEach((c) => used.add(c));
 
+  // 가시는 멈추지 않고 걸어서 지나갈 수 있는 칸에만 둔다:
+  // 드나드는 길이 모두 평지(점프·발판·구덩이 없음)이고, 가시 칸끼리는 붙지 않는다
   const busy = new Set([...stairs, ...pads].map((s) => s.cell));
-  const spikes = order
-    .filter((c) => !used.has(c) && !cells[c].pit && !busy.has(c) && !doorCells.has(c) && depth[c] > 3)
-    .filter(() => rand() < 0.16)
-    .map((cell) => ({ cell, phase: rand() * 2.6 }));
+  const allFlat = (c) => cells[c].links.every((n) => edges.get(edgeKey(c, n)).type === 'flat');
+  const spiked = new Set();
+  for (const c of order) {
+    if (used.has(c) || cells[c].pit || busy.has(c) || doorCells.has(c) || depth[c] <= 3) continue;
+    if (!allFlat(c) || cells[c].links.some((n) => spiked.has(n))) continue;
+    if (rand() < 0.22) spiked.add(c);
+  }
+  const spikes = [...spiked].map((cell) => ({ cell, phase: rand() * SPIKE_PERIOD }));
 
   const platforms = order
     .filter((c) => cells[c].pit)

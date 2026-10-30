@@ -72,14 +72,15 @@ function makePad() {
 
 function makeSpikes() {
   const g = new THREE.Group();
-  const plate = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.06, 2.6), toon('#6d5f7a'));
+  // 칸 안쪽 전체를 덮는다: 보이는 범위 = 찔리는 범위
+  const plate = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.06, 3.6), toon('#6d5f7a'));
   plate.position.y = 0.03;
   const blades = new THREE.Group();
-  const cone = new THREE.ConeGeometry(0.16, 0.6, 6);
+  const cone = new THREE.ConeGeometry(0.15, 0.6, 6);
   const mat = toon('#e9e4f2');
-  for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) {
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
     const s = new THREE.Mesh(cone, mat);
-    s.position.set(i * 0.8, 0.3, j * 0.8);
+    s.position.set((i - 1.5) * 0.85, 0.3, (j - 1.5) * 0.85);
     s.castShadow = true;
     blades.add(s);
   }
