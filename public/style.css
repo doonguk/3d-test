@@ -378,3 +378,13 @@ button.slot { cursor: pointer; }
 #edit-tray p { margin: 0; }
 
 .small { font-size: 12px; }
+
+#maze-link {
+  position: absolute;
+  top: 56px;
+  left: 16px;
+  padding: 8px 14px;
+  font-size: 15px;
+  text-decoration: none;
+}
+#hud.editing #maze-link { display: none; }
