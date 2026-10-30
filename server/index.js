@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { Server } from 'socket.io';
 import { loginUser, getInventory } from './db.js';
 import { setupTrade } from './trade.js';
+import { setupGifts } from './gifts.js';
 
 const PORT = Number(process.env.PORT ?? 3000);
 const WORLD_RADIUS = 37;
@@ -18,12 +19,14 @@ const io = new Server(http);
 const players = new Map();
 
 const bindTrade = setupTrade(io, players);
+const gifts = setupGifts(io, players);
 
 const publicPlayer = (p) => ({ sid: p.sid, name: p.name, animal: p.animal, color: p.color, x: p.x, z: p.z, ry: p.ry });
 const num = (v, fallback = 0) => (Number.isFinite(v) ? v : fallback);
 
 io.on('connection', (socket) => {
   bindTrade(socket);
+  gifts.bind(socket);
 
   socket.on('join', (data, ack) => {
     if (typeof ack !== 'function' || players.has(socket.id)) return;
@@ -47,6 +50,7 @@ io.on('connection', (socket) => {
       me: publicPlayer(p),
       players: [...players.values()].filter((o) => o !== p).map(publicPlayer),
       inventory: getInventory(user.id),
+      gifts: gifts.list(),
     });
     socket.broadcast.emit('player:join', publicPlayer(p));
     io.emit('chat', { system: true, text: `${name} 님이 마을에 놀러 왔어요!` });

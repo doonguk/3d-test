@@ -72,6 +72,19 @@ try {
   check(ia.coins === 75 && ib.coins === 125, `코인 이동 (앨리스 ${ia.coins}, 보리 ${ib.coins})`);
   check(ia.items.length === 2 && ib.items.some((it) => it.id === giveItem), '아이템 소유권 이동');
 
+  const gift = ra.gifts[0];
+  check(ra.gifts.length > 0, `선물상자 ${ra.gifts.length}개 배치`);
+  const far = wait(a, 'gift:got');
+  a.emit('move', { x: gift.x + 10, z: gift.z, ry: 0 });
+  a.emit('gift:pickup', gift.id);
+  const tooFar = await Promise.race([far.then(() => true), new Promise((r) => setTimeout(() => r(false), 300))]);
+  check(!tooFar, '멀리서는 선물을 못 주움');
+  const got = wait(a, 'inventory');
+  a.emit('move', { x: gift.x, z: gift.z, ry: 0 });
+  a.emit('gift:pickup', gift.id);
+  const inv = await got;
+  check(gift.kind === 'coin' ? inv.coins === ia.coins + 15 : inv.items.length === ia.items.length + 1, `선물 줍기 (${gift.kind})`);
+
   console.log('\n모든 스모크 테스트 통과 🎉');
 } finally {
   a.close();

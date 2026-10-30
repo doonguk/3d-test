@@ -168,6 +168,7 @@ function enterWorld(res) {
   res.players.forEach(addOther);
   setInventory(res.inventory);
   renderOnline();
+  document.dispatchEvent(new CustomEvent('entered', { detail: res }));
   toast(res.isNew ? '환영해요! 선물로 코인과 아이템을 받았어요 🎁' : `다시 왔네요, ${res.me.name}!`);
 }
 

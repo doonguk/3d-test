@@ -125,3 +125,11 @@ export function executeTrade(a, b) {
     q.logTrade.run(a.userId, b.userId, JSON.stringify(a.items), JSON.stringify(b.items), a.coins, b.coins);
   });
 }
+
+export function giveItem(userId, kind) {
+  q.insertItem.run(userId, kind);
+}
+
+export function addCoins(userId, amount) {
+  q.addCoins.run(amount, userId);
+}
