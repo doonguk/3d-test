@@ -54,9 +54,41 @@
 
     <div id="help">WASD·방향키 이동 · Space 점프 · 드래그 시점 · 휠 줌 · 친구 클릭 → 거래</div>
     <div id="toasts"></div>
+
+    <div id="player-menu" class="popover" hidden>
+      <strong id="player-menu-name"></strong>
+      <button id="player-menu-trade" class="primary small">🤝 거래 요청</button>
+    </div>
+
+    <div id="requests"></div>
+
+    <div id="trade" class="overlay soft" hidden>
+      <div class="card trade-card">
+        <h2>🤝 <span id="trade-partner"></span> 님과 거래</h2>
+        <div class="trade-cols">
+          <section class="trade-side">
+            <header>내가 줄 것 <span id="trade-my-ready" class="ready-badge" hidden>준비 완료</span></header>
+            <div id="trade-my-offer" class="grid offer"></div>
+            <label class="coin-input">🪙 <input id="trade-coins" type="number" min="0" step="1" value="0" /></label>
+          </section>
+          <section class="trade-side">
+            <header>받을 것 <span id="trade-their-ready" class="ready-badge" hidden>준비 완료</span></header>
+            <div id="trade-their-offer" class="grid offer"></div>
+            <div class="coin-input">🪙 <span id="trade-their-coins">0</span></div>
+          </section>
+        </div>
+        <p class="muted hint">아래 가방에서 줄 아이템을 눌러 담아요</p>
+        <div id="trade-inventory" class="grid"></div>
+        <div class="trade-actions">
+          <button id="trade-cancel" class="ghost">취소</button>
+          <button id="trade-ready" class="primary">준비 완료</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/trade.js"></script>
 </body>
 </html>

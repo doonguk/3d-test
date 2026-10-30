@@ -232,3 +232,75 @@ button.slot { cursor: pointer; }
   #help { display: none; }
   #chat-log { max-height: 120px; }
 }
+
+/* ---------- 거래 ---------- */
+.popover {
+  position: absolute;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transform: translate(-50%, calc(-100% - 12px));
+}
+.primary.small { padding: 6px 12px; font-size: 15px; }
+.ghost {
+  border: 2px solid var(--pink-soft);
+  background: #fff;
+  border-radius: 16px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+#requests {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.request {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  animation: pop 0.25s ease-out;
+}
+.request button { padding: 6px 12px; font-size: 14px; }
+
+.overlay.soft { background: rgba(255, 240, 246, 0.45); backdrop-filter: blur(2px); }
+.trade-card { width: min(460px, 100%); text-align: left; gap: 12px; }
+.trade-card h2 { margin: 0; font-weight: 400; font-size: 22px; text-align: center; }
+.trade-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.trade-side {
+  padding: 10px;
+  border-radius: 14px;
+  background: #fff6f9;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.trade-side header { display: flex; justify-content: space-between; align-items: center; font-size: 15px; }
+.grid.offer { grid-template-columns: repeat(4, 1fr); min-height: 44px; }
+.grid.offer:empty::after { content: '아직 없음'; }
+.grid.offer .slot { background: #fff; }
+#trade-inventory { grid-template-columns: repeat(8, 1fr); max-height: 140px; overflow-y: auto; }
+.coin-input { display: flex; align-items: center; gap: 6px; color: #c48a00; }
+.coin-input input {
+  width: 100%;
+  border: 2px solid var(--pink-soft);
+  border-radius: 10px;
+  padding: 4px 8px;
+  outline: none;
+}
+.ready-badge { padding: 1px 8px; border-radius: 8px; background: #caffbf; font-size: 12px; color: #2d6a2d; }
+.hint { margin: 0; font-size: 13px; }
+.trade-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.trade-actions .primary { flex: 1; }
