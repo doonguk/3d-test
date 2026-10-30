@@ -2,9 +2,10 @@ import express from 'express';
 import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { Server } from 'socket.io';
-import { loginUser, getInventory } from './db.js';
+import { loginUser, getInventory, claimPlot } from './db.js';
 import { setupTrade } from './trade.js';
 import { setupGifts } from './gifts.js';
+import { setupYards, PLOT_COUNT } from './yards.js';
 
 const PORT = Number(process.env.PORT ?? 3000);
 const WORLD_RADIUS = 37;
@@ -20,13 +21,24 @@ const players = new Map();
 
 const bindTrade = setupTrade(io, players);
 const gifts = setupGifts(io, players);
+const yards = setupYards(io, players);
 
-const publicPlayer = (p) => ({ sid: p.sid, name: p.name, animal: p.animal, color: p.color, x: p.x, z: p.z, ry: p.ry });
+const publicPlayer = (p) => ({
+  sid: p.sid,
+  name: p.name,
+  animal: p.animal,
+  color: p.color,
+  x: p.x,
+  z: p.z,
+  ry: p.ry,
+  plot: p.plot,
+});
 const num = (v, fallback = 0) => (Number.isFinite(v) ? v : fallback);
 
 io.on('connection', (socket) => {
   bindTrade(socket);
   gifts.bind(socket);
+  yards.bind(socket);
 
   socket.on('join', (data, ack) => {
     if (typeof ack !== 'function' || players.has(socket.id)) return;
@@ -39,9 +51,10 @@ io.on('connection', (socket) => {
     }
 
     const user = loginUser(name, animal, color);
+    const plot = claimPlot(user, PLOT_COUNT);
     const angle = Math.random() * Math.PI * 2;
     const r = 3 + Math.random() * 4;
-    const p = { sid: socket.id, userId: user.id, name, animal, color, x: Math.cos(angle) * r, z: Math.sin(angle) * r, ry: 0 };
+    const p = { sid: socket.id, userId: user.id, name, animal, color, x: Math.cos(angle) * r, z: Math.sin(angle) * r, ry: 0, plot };
     players.set(socket.id, p);
 
     ack({
@@ -51,7 +64,9 @@ io.on('connection', (socket) => {
       players: [...players.values()].filter((o) => o !== p).map(publicPlayer),
       inventory: getInventory(user.id),
       gifts: gifts.list(),
+      ...yards.snapshot(user.id),
     });
+    if (plot != null) io.emit('yard:update', { plot, name, color });
     socket.broadcast.emit('player:join', publicPlayer(p));
     io.emit('chat', { system: true, text: `${name} 님이 마을에 놀러 왔어요!` });
   });
